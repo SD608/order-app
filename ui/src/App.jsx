@@ -2,9 +2,19 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import { api } from './api'
 import { ORDER_STATUSES, getStockState, orderCounts } from './domain'
+import americanoHotImage from './assets/menu/americano-hot.png'
+import americanoIceImage from './assets/menu/americano-ice.png'
+import cafeLatteImage from './assets/menu/cafe-latte.png'
+import vanillaLatteImage from './assets/menu/vanilla-latte.png'
 
 const formatPrice = (price) => `${Number(price).toLocaleString('ko-KR')}원`
 const formatDate = (date) => new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(date))
+const menuImages = {
+  'americano-hot': americanoHotImage,
+  'americano-ice': americanoIceImage,
+  'cafe-latte': cafeLatteImage,
+  'vanilla-latte': vanillaLatteImage,
+}
 
 function CoffeeVisual({ type }) {
   return <div className={`coffee-visual coffee-visual--${type}`} aria-hidden="true"><span className="coffee-steam coffee-steam--one" /><span className="coffee-steam coffee-steam--two" /><div className="coffee-cup"><span className="coffee-liquid" /><span className="coffee-foam" /></div><span className="coffee-handle" /><span className="coffee-shadow" /></div>
@@ -15,7 +25,7 @@ function MenuCard({ menu, onAdd }) {
   const menuPrice = menu.price + selectedOptions.reduce((sum, id) => sum + (menu.options.find((option) => option.id === id)?.price ?? 0), 0)
   const unavailable = !menu.isActive || menu.stock === 0
   const toggleOption = (id) => setSelectedOptions((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
-  return <article className="menu-card"><CoffeeVisual type={menu.visual} /><div className="menu-card__body"><div className="menu-card__heading"><h2>{menu.name}</h2><strong>{formatPrice(menu.price)}</strong></div><p className="menu-card__description">{menu.description}</p><div className="menu-card__options" aria-label={`${menu.name} 옵션`}>{menu.options.map((option) => <label className="option-row" key={option.id}><input type="checkbox" checked={selectedOptions.includes(option.id)} onChange={() => toggleOption(option.id)} disabled={unavailable} /><span>{option.label}</span><small>{option.price ? `+${formatPrice(option.price)}` : '+0원'}</small></label>)}</div><div className="menu-card__footer"><span className="menu-card__selected-price">{formatPrice(menuPrice)}</span><button className="button button--primary button--full" type="button" disabled={unavailable} onClick={() => onAdd(menu, selectedOptions)}>{unavailable ? '품절' : '담기'}</button></div></div></article>
+  return <article className="menu-card">{menuImages[menu.id] ? <img className="menu-card__image" src={menuImages[menu.id]} alt={`${menu.name} 이미지`} /> : <CoffeeVisual type={menu.visual} />}<div className="menu-card__body"><div className="menu-card__heading"><h2>{menu.name}</h2><strong>{formatPrice(menu.price)}</strong></div><p className="menu-card__description">{menu.description}</p><div className="menu-card__options" aria-label={`${menu.name} 옵션`}>{menu.options.map((option) => <label className="option-row" key={option.id}><input type="checkbox" checked={selectedOptions.includes(option.id)} onChange={() => toggleOption(option.id)} disabled={unavailable} /><span>{option.label}</span><small>{option.price ? `+${formatPrice(option.price)}` : '+0원'}</small></label>)}</div><div className="menu-card__footer"><span className="menu-card__selected-price">{formatPrice(menuPrice)}</span><button className="button button--primary button--full" type="button" disabled={unavailable} onClick={() => onAdd(menu, selectedOptions)}>{unavailable ? '품절' : '담기'}</button></div></div></article>
 }
 
 function CartItem({ item, onQuantityChange, onRemove }) {
