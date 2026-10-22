@@ -1,0 +1,26 @@
+# 환경 변수와 비밀값
+.env
+.env.*
+!.env.example
+
+# 의존성 및 패키지 매니저 캐시
+node_modules/
+.npm-cache/
+
+# 실행 및 테스트 산출물
+logs/
+*.log
+coverage/
+dist/
+build/
+
+# 로컬 임시 파일
+tmp/
+temp/
+*.local
+
+# 운영체제 및 에디터 파일
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
