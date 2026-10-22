@@ -1,13 +1,14 @@
 require('dotenv').config()
 
 const app = require('./app')
-const { checkDatabaseConnection } = require('./db')
+const { checkDatabaseConnection, initializeDatabase } = require('./db')
 
 const port = Number(process.env.PORT) || 4000
 
 async function startServer() {
   try {
     const database = await checkDatabaseConnection()
+    await initializeDatabase()
     console.log(`PostgreSQL connected: ${database.database}`)
 
     app.listen(port, () => {

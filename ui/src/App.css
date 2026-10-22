@@ -20,3 +20,24 @@
 .inventory-card__main{grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding:18px 16px}.inventory-card__stock-line{min-width:0}.inventory-card__controls{gap:6px}
 .inventory-card__main{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:14px}.inventory-card h3{white-space:nowrap}.inventory-card__controls{grid-column:1 / -1;justify-content:center}
 @media (max-width:600px){.inventory-card__main{grid-template-columns:1fr;gap:12px;padding:15px}.inventory-card__stock-line{justify-content:flex-start}.inventory-card__controls{justify-content:flex-start}}
+
+/* 주문 화면 밀도 조정 */
+.menu-card__options{gap:5px}
+.option-row{gap:6px;font-size:11px;line-height:1.25}
+.option-row input{width:13px;height:13px}
+.option-row small{font-size:10px}
+.cart-item{gap:30px}
+.cart-item__info{padding-right:8px}
+.cart-item__controls{grid-template-columns:76px 88px 20px;gap:9px}
+.quantity-control{gap:2px;padding:2px}
+.quantity-control button{width:18px;height:18px;font-size:12px}
+.quantity-control span{font-size:11px}
+
+/* 관리자 재고 수량과 주문 작업 버튼을 명확하게 표시 */
+.inventory-card__stock-value{display:inline-block;min-width:2ch;color:var(--ink);font-size:27px;font-weight:800;line-height:1}
+.order-action{display:inline-flex;align-items:center;justify-content:center;min-width:68px}
+
+@media (max-width:600px){
+  .cart-item{gap:16px}
+  .cart-item__controls{grid-template-columns:68px auto 20px;gap:7px}
+}

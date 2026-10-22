@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const { checkDatabaseConnection } = require('./db')
+const apiRouter = require('./api')
 
 const app = express()
 
@@ -30,6 +31,8 @@ app.get('/health/db', async (_req, res) => {
   }
 })
 
+app.use('/api', apiRouter)
+
 app.get('/api', (_req, res) => {
   res.status(200).json({
     name: 'COZY Coffee Order API',
@@ -48,10 +51,10 @@ app.use((_req, res) => {
 
 app.use((error, _req, res, _next) => {
   console.error(error)
-  res.status(500).json({
+  res.status(error.status || 500).json({
     error: {
-      code: 'INTERNAL_SERVER_ERROR',
-      message: '서버에서 오류가 발생했습니다.',
+      code: error.code || 'INTERNAL_SERVER_ERROR',
+      message: error.status ? error.message : '서버에서 오류가 발생했습니다.',
     },
   })
 })

@@ -1,0 +1,26 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:4000/api'
+
+async function request(path, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  })
+  const body = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    const error = new Error(body.error?.message || body.message || '요청을 처리하지 못했습니다.')
+    error.code = body.error?.code
+    error.status = response.status
+    throw error
+  }
+  return body
+}
+
+export const api = {
+  getMenus: () => request('/menus'),
+  createOrder: (items, clientRequestId) => request('/orders', { method: 'POST', headers: { 'Idempotency-Key': clientRequestId }, body: JSON.stringify({ items, clientRequestId }) }),
+  getDashboard: () => request('/admin/dashboard'),
+  getInventory: () => request('/admin/inventory'),
+  updateInventory: (menuId, delta) => request(`/admin/inventory/${menuId}`, { method: 'PATCH', body: JSON.stringify({ delta }) }),
+  getOrders: () => request('/admin/orders'),
+  updateOrderStatus: (orderId, status) => request(`/admin/orders/${orderId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+}
