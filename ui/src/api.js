@@ -8,8 +8,11 @@ if (!API_BASE_URL) {
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
   })
   const body = await response.json().catch(() => ({}))
   if (!response.ok) {
@@ -24,9 +27,10 @@ async function request(path, options = {}) {
 export const api = {
   getMenus: () => request('/menus'),
   createOrder: (items, clientRequestId) => request('/orders', { method: 'POST', headers: { 'Idempotency-Key': clientRequestId }, body: JSON.stringify({ items, clientRequestId }) }),
-  getDashboard: () => request('/admin/dashboard'),
-  getInventory: () => request('/admin/inventory'),
-  updateInventory: (menuId, delta) => request(`/admin/inventory/${menuId}`, { method: 'PATCH', body: JSON.stringify({ delta }) }),
-  getOrders: () => request('/admin/orders'),
-  updateOrderStatus: (orderId, status) => request(`/admin/orders/${orderId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  loginAdmin: (password) => request('/admin/session', { method: 'POST', body: JSON.stringify({ password }) }),
+  getDashboard: (token) => request('/admin/dashboard', { headers: { Authorization: `Bearer ${token}` } }),
+  getInventory: (token) => request('/admin/inventory', { headers: { Authorization: `Bearer ${token}` } }),
+  updateInventory: (menuId, delta, token) => request(`/admin/inventory/${menuId}`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ delta }) }),
+  getOrders: (token) => request('/admin/orders', { headers: { Authorization: `Bearer ${token}` } }),
+  updateOrderStatus: (orderId, status, token) => request(`/admin/orders/${orderId}/status`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ status }) }),
 }

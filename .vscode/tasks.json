@@ -7,6 +7,13 @@
 			"command": "npm.cmd --prefix ui run dev -- --host 127.0.0.1",
 			"isBackground": true,
 			"problemMatcher": []
+		},
+		{
+			"label": "Validate project",
+			"type": "shell",
+			"command": "npm.cmd --prefix server test; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd --prefix ui test; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd --prefix ui run lint; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd --prefix ui run build",
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }

@@ -1,5 +1,6 @@
 const express = require('express')
 const { pool } = require('./db')
+const { createAdminToken, isAdminAuthConfigured, safeCompare, verifyAdminToken } = require('./admin-auth')
 
 const router = express.Router()
 const ORDER_STATUSES = ['received', 'making', 'complete']
@@ -45,6 +46,54 @@ async function getOrders(client = pool) {
 
 router.get('/menus', async (_req, res, next) => {
   try { res.json({ menus: await getMenus() }) } catch (error) { next(error) }
+})
+
+router.post('/admin/session', (req, res) => {
+  const { ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = process.env
+  if (!isAdminAuthConfigured(ADMIN_PASSWORD, ADMIN_SESSION_SECRET)) {
+    return res.status(503).json({
+      error: {
+        code: 'ADMIN_AUTH_NOT_CONFIGURED',
+        message: '관리자 로그인 설정이 완료되지 않았습니다.',
+      },
+    })
+  }
+
+  if (typeof req.body?.password !== 'string' || !safeCompare(req.body.password, ADMIN_PASSWORD)) {
+    return res.status(401).json({
+      error: {
+        code: 'ADMIN_AUTH_REQUIRED',
+        message: '관리자 비밀번호가 올바르지 않습니다.',
+      },
+    })
+  }
+
+  res.json({ token: createAdminToken(ADMIN_SESSION_SECRET) })
+})
+
+router.use('/admin', (req, res, next) => {
+  const { ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = process.env
+  if (!isAdminAuthConfigured(ADMIN_PASSWORD, ADMIN_SESSION_SECRET)) {
+    return res.status(503).json({
+      error: {
+        code: 'ADMIN_AUTH_NOT_CONFIGURED',
+        message: '관리자 로그인 설정이 완료되지 않았습니다.',
+      },
+    })
+  }
+
+  const authorization = req.get('authorization') || ''
+  const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : ''
+  if (!verifyAdminToken(token, ADMIN_SESSION_SECRET)) {
+    return res.status(401).json({
+      error: {
+        code: 'ADMIN_AUTH_REQUIRED',
+        message: '관리자 로그인이 필요합니다.',
+      },
+    })
+  }
+
+  next()
 })
 
 router.post('/orders', async (req, res, next) => {
