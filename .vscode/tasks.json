@@ -14,6 +14,13 @@
 			"command": "npm.cmd --prefix server test; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd --prefix ui test; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd --prefix ui run lint; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; npm.cmd --prefix ui run build",
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "Check deployed commit pointer",
+			"type": "shell",
+			"command": "git ls-remote order-app refs/heads/main",
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }
